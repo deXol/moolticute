@@ -153,6 +153,8 @@ void MPDevice::setupMessageProtocol()
         }
     });
 
+    QTimer::singleShot(5000, [this](){sendData(MPCmd::START_MEMORYMGMT);});
+    QTimer::singleShot(15000, [this](){sendData(MPCmd::END_MEMORYMGMT);});
     //For testing storeCredential and getCredential
     //TODO: Only for testing
 //    QTimer::singleShot(2000, [this](){
