@@ -608,6 +608,9 @@ MainWindow::MainWindow(WSClient *client, DbMasterController *mc, QWidget *parent
     // Restore geometry and state from last session.
     restoreGeometry(s.value("MainWindow/geometry").toByteArray());
     restoreState(s.value("MainWindow/windowState").toByteArray());
+
+    bTutorialFinished = s.value("settings/tutorial_finished", false).toBool();
+    ui->stackedWidget->setCurrentWidget(ui->pageTutorial);
 }
 
 MainWindow::~MainWindow()
@@ -685,7 +688,12 @@ void MainWindow::updatePage()
 
     // When an import db operation is peformed in an unknown card
     // don't change the page until the operation is finished
-    if (ui->stackedWidget->currentWidget() == ui->pageWaiting &&
+    if (!bTutorialFinished)
+    {
+        ui->stackedWidget->setCurrentWidget(ui->pageTutorial);
+        setEnabledToAllTabButtons(false);
+    }
+    else if (ui->stackedWidget->currentWidget() == ui->pageWaiting &&
             ui->labelWait->text().contains("import_db_job"))
         ui->stackedWidget->setCurrentWidget(ui->pageWaiting);
 
@@ -1208,6 +1216,19 @@ void MainWindow::checkSubdomainSelection()
         ui->pushButtonSubDomain->setText(tr("Enable"));
 }
 
+void MainWindow::setEnabledToAllTabButtons(bool enabled)
+{
+    ui->widgetHeader->setEnabled(enabled);
+    for (QObject * object: ui->widgetHeader->children())
+    {
+        if (typeid(*object) ==  typeid(QPushButton))
+        {
+            QAbstractButton *tabButton = qobject_cast<QAbstractButton *>(object);
+            tabButton->setEnabled(enabled);
+        }
+    }
+}
+
 void MainWindow::checkHIBPSetting()
 {
     QSettings s;
@@ -1469,18 +1490,10 @@ void MainWindow::enableCredentialsManagement(bool enable)
 
 void MainWindow::updateTabButtons()
 {
-    auto setEnabledToAllTabButtons = [=](bool enabled)
+    if (!bTutorialFinished)
     {
-        ui->widgetHeader->setEnabled(enabled);
-        for (QObject * object: ui->widgetHeader->children())
-        {
-            if (typeid(*object) ==  typeid(QPushButton))
-            {
-                QAbstractButton *tabButton = qobject_cast<QAbstractButton *>(object);
-                tabButton->setEnabled(enabled);
-            }
-        }
-    };
+        return;
+    }
 
     if (ui->stackedWidget->currentWidget() == ui->pageWaiting)
         setEnabledToAllTabButtons(false);
@@ -1814,4 +1827,13 @@ void MainWindow::on_pushButtonHIBP_clicked()
 
         checkHIBPSetting();
     }
+}
+
+void MainWindow::on_btnExitTutorial_clicked()
+{
+    QSettings s;
+    s.setValue("settings/tutorial_finished", true);
+    bTutorialFinished = true;
+    setEnabledToAllTabButtons(true);
+    updatePage();
 }

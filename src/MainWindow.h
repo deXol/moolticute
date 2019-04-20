@@ -129,6 +129,8 @@ private slots:
 
     void on_pushButtonHIBP_clicked();
 
+    void on_btnExitTutorial_clicked();
+
 private:
     void setUIDRequestInstructionsWithId(const QString &id = "XXXX");
 
@@ -138,6 +140,8 @@ private:
     void checkAutoStart();
     
     void checkSubdomainSelection();
+
+    void setEnabledToAllTabButtons(bool enabled);
 
     void checkHIBPSetting();
 
@@ -165,6 +169,7 @@ private:
     bool bSSHKeysTabVisibleOnDemand;
     bool bBleDevTabVisible = false;
     bool dbBackupTrakingControlsVisible;
+    bool bTutorialFinished = false;
 
     QShortcut *m_FilesAndSSHKeysTabsShortcut;
     QShortcut *m_BleDevTabShortcut;
