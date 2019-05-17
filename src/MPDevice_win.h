@@ -95,6 +95,7 @@ private:
     virtual void platformWrite(const QByteArray &data);
 
     bool openPath();
+    void retryOpenPath();
     static HANDLE openDevice(QString path, bool exlusive = false);
 
     //GetLastError() helper

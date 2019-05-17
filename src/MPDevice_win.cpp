@@ -43,15 +43,7 @@ MPDevice_win::MPDevice_win(QObject *parent, const MPPlatformDef &p):
         qWarning() << "Error opening device";
         QTimer::singleShot(50, [this]()
         {
-            if (openPath())
-            {
-                platformRead();
-                sendInitMessages();
-            }
-            else
-            {
-                qCritical() << "Device open failed after retry.";
-            }
+            retryOpenPath();
         });
     }
     else
@@ -153,6 +145,19 @@ bool MPDevice_win::openPath()
     return true;
 }
 
+void MPDevice_win::retryOpenPath()
+{
+    if (openPath())
+    {
+        platformRead();
+        sendInitMessages();
+    }
+    else
+    {
+        qCritical() << "Device open failed after retry.";
+    }
+}
+
 void MPDevice_win::platformWrite(const QByteArray &data)
 {
     QByteArray ba;
@@ -179,6 +184,10 @@ void MPDevice_win::platformWrite(const QByteArray &data)
     {
         qWarning() << "Failed to write data to device! " << err;
         qWarning() << getLastError(err);
+        if (INVALID_HANDLE_VALUE == platformDef.devHandle)
+        {
+            retryOpenPath();
+        }
     }
 }
 
