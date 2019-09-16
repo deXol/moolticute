@@ -259,6 +259,19 @@ void MPDevice_emul::platformWrite(const QByteArray &data)
         sendReadSignal(d);
         break;
     }
+    case MPCmd::GET_FREE_ADDRESSES:
+    {
+        //TODO implement
+        QByteArray d;
+        d[0] = 4;
+        d[1] = commandData;
+        for (int i = 2; i < 6; i++)
+            d[i] = 0x00;
+
+        d.resize(64);
+        sendReadSignal(d);
+        break;
+    }
       /* MPCmd::READ_FLASH_NODE
                MPCmd::GET_DN_START_PARENT
                MPCmd::GET_STARTING_PARENT
@@ -278,10 +291,7 @@ void MPDevice_emul::platformWrite(const QByteArray &data)
 
 void MPDevice_emul::sendReadSignal(const QByteArray &data)
 {
-    QTimer::singleShot(0, [=]()
-    {
         emit platformDataRead(data);
-    });
 }
 
 void MPDevice_emul::platformRead()

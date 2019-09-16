@@ -499,7 +499,8 @@ void MPDevice::sendDataDequeue()
     }
     else
     {
-        currentCmd.timerTimeout->start();
+        //TODO investigate for testing
+        //currentCmd.timerTimeout->start();
     }
 }
 
